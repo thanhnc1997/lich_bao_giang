@@ -601,6 +601,7 @@ hr {
       margin-right: 16px; }
   .modal .modal-body {
     overflow-y: auto;
+    margin-bottom: auto;
     padding: 16px; }
 
 .dropdown {
@@ -828,7 +829,8 @@ hr {
     .tag-list .tag-item:last-child {
       margin-right: 0; }
     .tag-list .tag-item:hover {
-      background: #F4F4F4; }
+      background: #F4F4F4;
+      color: #333; }
     .tag-list .tag-item.active {
       color: #03177E;
       background: #C3E6FF;
@@ -886,6 +888,8 @@ hr {
       background: #F4F4F4; }
     .teacher-curriculum-list .item p {
       flex: 0 0 55%; }
+    .teacher-curriculum-list .item .btn {
+      flex: 0 0 60px; }
 
 .schedule-row {
   display: grid;
@@ -917,6 +921,9 @@ hr {
       padding: 16px 0;
       align-items: self-start;
       background: #fff; } }
+  @media (min-width: 991px) {
+    .home-page .page-content {
+      padding: 0 16px; } }
   @media (min-width: 991px) {
     .home-page .side-nav {
       background: #fff;

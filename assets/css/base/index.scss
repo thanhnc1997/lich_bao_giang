@@ -631,6 +631,7 @@ hr {
 	
 	.modal-body {
 		overflow-y: auto;
+		margin-bottom: auto;
 		padding: 16px;
 	}
 }
@@ -941,6 +942,7 @@ hr {
 		
 		&:hover {
 			background: $grey5;
+			color: $dark;
 		}
 		
 		&.active {
@@ -1023,6 +1025,10 @@ hr {
 		
 		p {
 			flex: 0 0 55%;
+		}
+		
+		.btn {
+			flex: 0 0 60px;
 		}
 	}
 }

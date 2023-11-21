@@ -28,6 +28,12 @@
 		background: $light;
 	}
 	
+	.page-content {
+		@media (min-width: 991px) {
+			padding: 0 16px;
+		}
+	}
+	
 	.side-nav {
 		@media (min-width: 991px) {
 			background: $light;

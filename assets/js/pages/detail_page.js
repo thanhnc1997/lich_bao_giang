@@ -3,7 +3,7 @@ import {
 } from '../helper.js';
 
 export async function render(params) {
-	let {type} = params;
+	let {type, user, data} = params;
 	let modal_template = '';
 	
 	document.body.classList.add('overflow-hidden');
@@ -28,6 +28,8 @@ export async function render(params) {
 	if (type == 'create') {
 		modal_template = await import('./detail_page/create_page.js');
 		template.querySelector('.modal-dialog').appendChild(await modal_template.render({
+			user: user,
+			detail: data,
 			async callback() {
 				await remove_template();
 			}

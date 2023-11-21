@@ -43,41 +43,7 @@ export async function render(params) {
 		<div class="scrollable-horizontal-list">
 			<span class="sticky">Tuần</span>
 			<div class="tag-list">
-				<span class="tag-item square">1</span>
-				<span class="tag-item square">2</span>
-				<span class="tag-item square active">3</span>
-				<span class="tag-item square">4</span>
-				<span class="tag-item square">5</span>
-				<span class="tag-item square">6</span>
-				<span class="tag-item square">7</span>
-				<span class="tag-item square">8</span>
-				<span class="tag-item square">9</span>
-				<span class="tag-item square">10</span>
-				<span class="tag-item square">11</span>
-				<span class="tag-item square">12</span>
-				<span class="tag-item square">13</span>
-				<span class="tag-item square">14</span>
-				<span class="tag-item square">15</span>
-				<span class="tag-item square">16</span>
-				<span class="tag-item square">17</span>
-				<span class="tag-item square">18</span>
-				<span class="tag-item square">19</span>
-				<span class="tag-item square">21</span>
-				<span class="tag-item square">22</span>
-				<span class="tag-item square">23</span>
-				<span class="tag-item square">24</span>
-				<span class="tag-item square">25</span>
-				<span class="tag-item square">26</span>
-				<span class="tag-item square">27</span>
-				<span class="tag-item square">28</span>
-				<span class="tag-item square">29</span>
-				<span class="tag-item square">30</span>
-				<span class="tag-item square">31</span>
-				<span class="tag-item square">32</span>
-				<span class="tag-item square">33</span>
-				<span class="tag-item square">34</span>
-				<span class="tag-item square">35</span>
-				<span class="tag-item square">36</span>
+				
 			</div>
 		</div>
 		`;
@@ -117,191 +83,13 @@ export async function render(params) {
 	async function list_curriculum() {
 		let div = create_element('div');
 		div.classList.add('teacher-curriculum-list');
-		div.innerHTML = `
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 3</b>
-			</p>
-			<span class="text-danger mr-auto">Thiếu</span>
-			<button class="btn btn-primary">Nộp</button>
-		</div>
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 2</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-success mr-auto">Đã duyệt</span>
-			<button class="btn btn-primary">Xem</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-
-		<div class="item">
-			<p>
-				<b class="d-block mb-4">Tuần 1</b>
-				<span class="text-secondary">Ngày tạo 14/11/2023</span>
-			</p>
-			<span class="text-warning mr-auto">Chờ duyệt</span>
-			<button class="btn btn-primary">Sửa</button>
-		</div>
-		`;
 		
 		div.querySelectorAll('.btn').forEach(btn => {
 			btn.addEventListener('click', async (e) => {
 				let modal = await import('../detail_page.js');
 				document.body.appendChild(await modal.render({
-					type: 'create'
+					type: 'create',
+					user: user
 				}));
 			});
 		});
@@ -310,7 +98,65 @@ export async function render(params) {
 	}
 	
 	async function load_curriculum(params) {
-		console.log(params)
+		template.querySelector('.teacher-curriculum-list').innerHTML = '';
+		let status = '',
+				text_color = '',
+				text_btn = '';
+		
+		params.map(item => {
+			if (item.status == 0) {
+				status = 'Thiếu';
+				text_color = 'text-danger';
+				text_btn = 'Nộp';
+			}
+			
+			if (item.status == 1) {
+				status = 'Chờ duyệt';
+				text_color = 'text-warning';
+				text_btn = 'Sửa';
+			}
+			
+			if (item.status == 2) {
+				status = 'Đã duyệt';
+				text_color = 'text-success';
+				text_btn = 'Xem';
+			}
+			
+			let div = create_element('div');
+			div.classList.add('item');
+			div.innerHTML = `
+			<p>
+				<b class="d-block mb-4">Tuần ${item.week.name}</b>
+				<span class="text-secondary">Từ ${item.week.start_date} đến ${item.week.end_date}</span>
+			</p>
+			<b class="${text_color} mr-auto">${status}</b>
+			<button class="btn btn-primary">${text_btn}</button>
+			`;
+			
+			div.querySelector('.btn').addEventListener('click', async (e) => {
+				let modal = await import('../detail_page.js');
+				document.body.appendChild(await modal.render({
+					type: 'create',
+					user: user,
+					data: item
+				}));
+			});
+			
+			template.querySelector('.teacher-curriculum-list').appendChild(div);
+		});
+	}
+	
+	async function load_week_list(params) {
+		let status = '',
+				text_color = ''
+		
+		params.map(item => {
+			let div = create_element('span');
+			div.classList.add('tag-item', 'square');
+			div.innerHTML = item.week.name;
+			
+			template.querySelector('.tag-list').appendChild(div);
+		});
 	}
 	
 	template.querySelector('.side-nav').appendChild(await search_box());
@@ -323,6 +169,7 @@ export async function render(params) {
 		url: API_URL + API_END_POINT.schedules,
 		auth: user.access_token,
 		async callback(params) {
+			await load_week_list(params);
 			await load_curriculum(params);
 		}
 	});

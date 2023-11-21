@@ -16,7 +16,7 @@ export async function render() {
 	let {role, access_token} = user_profile;
 	
 	if (role == true) {
-		block = await import('./listing/censor_listing.js');
+		block = await import('./listing/teacher_listing.js');
 	}
 	
 	if (role == false) {
