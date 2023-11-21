@@ -1,6 +1,7 @@
 import {
 	create_element,
-	common
+	common,
+	check_expried_token
 } from './helper.js';
 
 const pathname = location.pathname;
@@ -16,6 +17,14 @@ async function draw(blocks) {
 }
 
 const render = {
+	async sign_in() {
+		let block = await import('./pages/sign_in_page.js');
+		await draw([
+			block.render(),
+		]);
+		
+		await block.callback();
+	},
 	async home() {
 		await draw([
 			(await import('./pages/home_page.js')).render(),
@@ -44,9 +53,15 @@ const app = {
 		}
 	],
 	async init() {
+		if (!localStorage.getItem('user')) {
+			await render.sign_in();
+			return false;
+		}
+		
 		this.page.map(item => {
 			if (pathname.includes(item.url)) item.render();
 		});
+		check_expried_token(JSON.parse(localStorage.getItem('user')));
 	}
 }
 

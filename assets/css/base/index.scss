@@ -1,3 +1,8 @@
+@font-face {
+  font-family: Raleway;
+  src: url(Raleway-Regular.ttf);
+}
+
 @import 
 	'animation.scss',
 	'grid.scss';
@@ -17,6 +22,7 @@ $grey5: #F4F4F4;
   -webkit-tap-highlight-color: transparent;
 	line-height: 1.4;
 	font-family: arial, sans-serif;
+	font-family: Raleway;
 	scroll-behavior: smooth;
 	
 	&::-webkit-scrollbar {
@@ -28,21 +34,37 @@ html,
 body {
   font-size: 14px;
   color: $dark;
-	background: $light;
 }
 
 body {
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
-	background: #FFF7FC;
+	// background: #F5F5F5;
+	background: #EBFAFF;
 }
 
 #app {
-	max-width: 667px;
+	max-width: 991px;
 	width: 100%;
-	background: $light;
+	min-height: 100vh;
 	margin: 0 auto;
+}
+
+.template-wrapper {
+	@media (min-width: 991px) {
+		margin: 28px auto;
+		display: flex;
+		max-height: calc(100vh - 56px);
+		overflow: auto;
+		border-radius: 24px;
+		
+		background: rgba(255, 255, 255, .2);
+		box-shadow: 0 4px 30px rgba(0, 0, 0, .1);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, .4);
+	}
 }
 
 a,
@@ -90,7 +112,7 @@ button {
 
 select,
 .select {
-	background: #fff url('../images/carret_down.svg') no-repeat right center !important;
+	background: #fff url('../images/carret_down.png') no-repeat right center !important;
 }
 
 ul {
@@ -398,14 +420,15 @@ hr {
 	background: transparent;
 	text-decoration: none;
 	display: inline-block;
+	font-weight: 600;
 	
 	&.btn-light {
 		background: $grey4;
 	}
 	
 	&.btn-primary {
-		color: #2A0F96;
-		background: #D6C3FF;
+		color: #03177E;
+		background: #C3E6FF;
 	}
 	
 	&.btn-secondary {
@@ -545,15 +568,18 @@ hr {
 	z-index: 111;
 	// display: none;
 	
+	&.modal-scroll {
+		overflow: auto;
+	}
+	
 	.modal-dialog {
 		width: 100%;
-		max-height: calc(100% - 32px);
-		max-width: calc(100% - 32px);
-		margin: 28px auto;
+		height: 100%;
 		position: relative;
 		z-index: 111;
 		
-		@media (min-width: 768px) {
+		@media (min-width: 991px) {
+			margin: 16px auto;
 			max-width: 600px;
 			max-height: calc(100% - 56px);
 		}
@@ -561,12 +587,16 @@ hr {
 	
 	.modal-content {
 		width: 100%;
+		height: 100%;
 		display: flex;
 		flex-direction: column;
-		border-radius: 12px;
 		overflow: hidden;
-		background: #fff;
+		background: $light;
 		box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
+		
+		@media (min-width: 991px) {
+			border-radius: 12px;
+		}
 	}
 
 	.modal-header,
@@ -576,9 +606,8 @@ hr {
 	}
 
 	.modal-header {
-		border-bottom: 1px solid $grey3;		
+		border-bottom: 1px solid $grey4;		
 		position: relative;
-		color: $grey1;
 		
 		.modal-title {
 			font-size: 16px;
@@ -587,11 +616,16 @@ hr {
 			margin-bottom: 4px;
 		}
 		
-		.btn {
+		.btn.close {
 			position: absolute;
 			padding: 16px;
 			top: 0;
 			right: 0;
+		}
+		
+		.btn.back {
+			padding: 8px 12px 8px 0;
+			margin-right: 16px;
 		}
 	}
 	
@@ -609,7 +643,7 @@ hr {
 	position: absolute;
 	min-width: 140px;
 	white-space: nowrap;
-	font-size: 12.5px;
+	font-size: 14px;
 	font-weight: 500;
 	padding: 6px;
 	background: $light;
@@ -627,7 +661,7 @@ hr {
 	.dropdown-item {
 		display: block;
 		cursor: pointer;
-		padding: 4px 6px;
+		padding: 10px 6px;
 		border-radius: 4px;
 		margin: 0;
 		display: flex;
@@ -815,7 +849,39 @@ hr {
 }
 
 .nav {
-	padding: 8px 16px;
+	padding: 10px 16px;
+	overflow: hidden;
+	
+	&.date-nav {
+		display: grid;
+		grid-template: auto / 80px 1fr;
+		
+		.select {
+			background-color: transparent !important;
+			padding: 0;
+			height: auto;
+			border: 0;
+		}
+		
+		@media (min-width: 991px) {
+			padding-bottom: 16px;
+		}
+	}
+}
+
+.scrollable-horizontal-list {
+	overflow: auto;
+	
+	.sticky {
+		position: sticky;
+		left: 0;
+		padding: 8px 16px;
+		display: block;
+		
+		@media (min-width: 991px) {
+			display: none;
+		}
+	}
 }
 
 .search-form {
@@ -824,18 +890,33 @@ hr {
 	display: flex;
 	align-items: center;
 	
+	@media (min-width: 991px) {
+		border: 0;
+	}
+	
 	.search-box {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		flex-grow: 1;
+		width: 100%;
+		
+		@media (min-width: 991px) {
+			background: $grey5;
+			border-radius: 100px;
+			padding: 0 12px;
+		}
 		
 		svg {
 			margin-right: 12px;
+			
+			@media (min-width: 991px) {
+				margin-right: 0;
+			}
 		}
 		
 		.input {
 			border: 0;
+			background: transparent;
 		}
 	}
 }
@@ -849,7 +930,7 @@ hr {
 	.tag-item {
 		cursor: pointer;
 		display: inline-block;
-		margin-right: 8px;
+		margin-right: 4px;
 		color: $grey1;
 		border-radius: 4px;
 		padding: 8px;
@@ -858,9 +939,13 @@ hr {
 			margin-right: 0;
 		}
 		
+		&:hover {
+			background: $grey5;
+		}
+		
 		&.active {
-			background: #FFC3EA;
-			color: #960F0F;
+			color: #03177E;
+			background: #C3E6FF;
 			font-weight: 600;
 		}
 		
@@ -890,7 +975,7 @@ hr {
 	
 	.item {
 		display: flex;
-		border-bottom: 1px solid #e1e1e1;
+		border-bottom: 1px solid $grey4;
   	margin-bottom: 6px;
 		
 		&:last-child {
@@ -911,4 +996,41 @@ hr {
 			}
 		}
 	}
+}
+
+.teacher-curriculum-list {
+	padding: 16px;
+	background: transparent;
+	
+	@media (min-width: 991px) {
+		padding: 0;
+		background: $light;
+		margin-top: 14px;
+		border-radius: 12px;
+	}
+	
+	.item {
+		display: flex;
+  	margin-bottom: 6px;
+		background: $light;
+		border-radius: 6px;
+		padding: 14px;
+		align-items: center;
+		
+		&:hover {
+			background: $grey5;
+		}
+		
+		p {
+			flex: 0 0 55%;
+		}
+	}
+}
+
+.schedule-row {
+	display: grid;
+	grid-template: auto / 45px 1fr;
+	padding: 14px 16px;
+	border-bottom: 1px solid $grey3;
+	background: $light;
 }
