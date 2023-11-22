@@ -3,7 +3,9 @@ import {
 	render_icon,
 	fetch_data,
 	API_URL,
-	API_END_POINT
+	API_END_POINT,
+	remove_loader,
+	loader
 } from '../../helper.js';
 
 export async function render(params) {
@@ -134,6 +136,7 @@ export async function render(params) {
 			`;
 			
 			div.querySelector('.btn').addEventListener('click', async (e) => {
+				loader();
 				let modal = await import('../detail_page.js');
 				document.body.appendChild(await modal.render({
 					type: 'create',
@@ -169,8 +172,10 @@ export async function render(params) {
 		url: API_URL + API_END_POINT.schedules,
 		auth: user.access_token,
 		async callback(params) {
+			loader();
 			await load_week_list(params);
 			await load_curriculum(params);
+			await remove_loader();
 		}
 	});
 	

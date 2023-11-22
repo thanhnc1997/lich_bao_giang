@@ -2,7 +2,8 @@ import {
 	create_element,
 	fetch_data,
 	API_URL,
-	API_END_POINT
+	API_END_POINT,
+	render_icon
 } from '../helper.js';
 
 let user_sign_in = {
@@ -30,14 +31,32 @@ export async function render() {
 			<label class="label">Tên đăng nhập</label>
 			<input class="input" placeholder="Tên đăng nhập" name="user_name">
 		</div>
-		<div class="mb-28">
-			<label class="label">Mật khẩu</label>
-			<input class="input" placeholder="Mật khẩu" name="password">
+		<div class="d-flex mb-28" style="align-items: flex-end;">
+			<div class="mr-12" style="flex-grow: 1">
+				<label class="label">Mật khẩu</label>
+				<input class="input" type="password" placeholder="Mật khẩu" name="password">
+			</div>
+			<button class="btn" style="background: #F4F4F4;">${render_icon.show({})}</button>
 		</div>
 		<button class="btn btn-primary">Đăng nhập</button>
 		`;
 		
-		div.querySelector('.btn').addEventListener('click',async (e) => {
+		div.querySelector('.btn').addEventListener('click', (e) => {
+			let input_password = div.querySelector('input[name="password"]');
+			if (input_password.getAttribute('type') == 'password') {
+				input_password.setAttribute('type', 'text');
+				e.currentTarget.innerHTML = render_icon.hide({});
+				return;
+			}
+			
+			if (input_password.getAttribute('type') == 'text') {
+				input_password.setAttribute('type', 'password');
+				e.currentTarget.innerHTML = render_icon.show({});
+				return;
+			}
+		});
+		
+		div.querySelector('.btn.btn-primary').addEventListener('click',async (e) => {
 			user_sign_in.username = div.querySelector('input[name="user_name"]').value;
 			user_sign_in.password = div.querySelector('input[name="password"]').value;
 			

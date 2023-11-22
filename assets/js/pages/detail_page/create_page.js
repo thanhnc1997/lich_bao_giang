@@ -4,7 +4,9 @@ import {
 	fetch_data,
 	API_END_POINT,
 	API_URL,
-	day_translate
+	day_translate,
+	loader,
+	remove_loader,
 } from '../../helper.js';
 
 export async function render(params) {
@@ -88,7 +90,6 @@ export async function render(params) {
 					template.querySelector('#period .tag-item.active').classList.remove('active');
 				}
 				span.classList.add('active');
-				
 				template.querySelector('.modal-body .period').appendChild(await load_period_detail(v));
 			});
 
@@ -99,12 +100,19 @@ export async function render(params) {
 	
 	async function load_period_detail(params) {
 		template.querySelector('.modal-body .period').innerHTML = '';
-		if (!params) return false;
+		let div = create_element('div');
+		
+		if (!params) {
+			div.innerHTML = `
+			<div class="text-center" style="padding: 16px; margin: 16px; background: #F4F4F4; border-radius: 12px;">
+				<b>Không có dữ liệu</b>
+			</div>`;
+			return div;
+		}
 		
 		let _class = params.class;
 		let {day, subject, component_id, empty_period} = params;
 		
-		let div = create_element('div');
 		div.innerHTML = `
 		<h4 style="padding: 16px; background: #EBFAFF;">
 			Ngày ${day.date}
@@ -136,15 +144,15 @@ export async function render(params) {
 				<label class="label required">Chuẩn bị điều chỉnh (TN, hoặc thay tiết dạy)</label>
 				<input class="input" placeholder="Nội dung">
 			</div>
+			<div class="mb-14" id="note" style="display: none;">
+				<input class="input" placeholder="Lý do trống tiết" name="note">
+			</div>
 			<div class="d-flex align-items-center">
 				<b class="mr-auto">Tiết trống</b>
 				<label class="switch">
 					<input type="checkbox" name="empty_period">
 					<span class="slider"></span>
 				</label>
-			</div>
-			<div id="note" style="margin-top: 14px; display: none;">
-				<input class="input" placeholder="Lý do trống tiết" name="note">
 			</div>
 		</div>
 		`;
@@ -240,7 +248,7 @@ export async function render(params) {
 		`;
 		
 		div.querySelectorAll('#session .tag-item').forEach(day => {
-			day.addEventListener('click', (e) => {
+			day.addEventListener('click', async (e) => {
 				div.querySelector('#session .tag-item.active').classList.remove('active');
 				day.classList.add('active');
 				date_session = e.currentTarget.getAttribute('data-session');
@@ -248,11 +256,11 @@ export async function render(params) {
 				load_period({day: current_day, date_session: date_session});
 				
 				if (date_session == 'morning') {
-					load_period_detail(create_obj[current_day][date_session][morning_p[0]]);
+					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[current_day][date_session][morning_p[0]]));
 				}
 				
 				if (date_session == 'afternoon') {
-					load_period_detail(create_obj[current_day][date_session][afternoon_p[0]]);
+					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[current_day][date_session][afternoon_p[0]]));
 				}
 			});
 		});
@@ -288,7 +296,8 @@ export async function render(params) {
 			
 			await format_period_list(params);
 			await load_period({day: current_day, date_session:date_session});
-			await load_period_detail(create_obj[current_day][date_session][morning_p[0]]);
+			template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[current_day][date_session][morning_p[0]]));
+			await remove_loader();
 		}
 	});
 	

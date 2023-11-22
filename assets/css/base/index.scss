@@ -698,12 +698,12 @@ hr {
   box-sizing: border-box;
   display: block;
   position: absolute;
-  width: 28px;
-  height: 28px;
-  border: 4px solid #D6C3FF;
+  width: 34px;
+  height: 34px;
+  border: 5px solid #03177E;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(.5, 0, .5, 1) infinite;
-  border-color: #D6C3FF transparent transparent transparent;
+  border-color: #03177E transparent transparent transparent;
 }
 
 .lds-ring div:nth-child(1) {
