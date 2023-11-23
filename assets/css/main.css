@@ -164,6 +164,7 @@ body {
   .template-wrapper {
     margin: 28px auto;
     display: flex;
+    min-height: calc(100vh - 56px);
     max-height: calc(100vh - 56px);
     overflow: auto;
     border-radius: 24px;
@@ -802,7 +803,7 @@ hr {
     width: 100%; }
     @media (min-width: 991px) {
       .search-form .search-box {
-        background: #F4F4F4;
+        background: #E1E1E1;
         border-radius: 100px;
         padding: 0 12px; } }
     .search-form .search-box svg {
@@ -897,6 +898,17 @@ hr {
   padding: 14px 16px;
   border-bottom: 1px solid #D9D9D9;
   background: #fff; }
+
+.list-heading {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 600; }
+  @media (min-width: 991px) {
+    .list-heading {
+      background: #CEF3FF;
+      padding: 12px 16px;
+      border-radius: 100px;
+      margin: 0 16px 14px; } }
 
 .sign-in-page {
   min-height: 100vh;

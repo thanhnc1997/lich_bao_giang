@@ -5,7 +5,8 @@ import {
 	API_URL,
 	API_END_POINT,
 	remove_loader,
-	loader
+	loader,
+	format_date
 } from '../../helper.js';
 
 export async function render(params) {
@@ -24,7 +25,7 @@ export async function render(params) {
 		div.innerHTML = `
 		<div class="search-box">
 			${render_icon.search({stroke: '#999'})}
-			<input type="text" name="search" class="input" placeholder="Tìm kiếm">
+			<input type="text" name="search" class="input" placeholder="Tìm kiếm lịch báo giảng">
 		</div>
 		`;
 		
@@ -85,6 +86,9 @@ export async function render(params) {
 	async function list_curriculum() {
 		let div = create_element('div');
 		div.classList.add('teacher-curriculum-list');
+		div.innerHTML = `
+		<h3>Danh sách Lịch báo giảng</h3>
+		`;
 		
 		div.querySelectorAll('.btn').forEach(btn => {
 			btn.addEventListener('click', async (e) => {
@@ -100,7 +104,9 @@ export async function render(params) {
 	}
 	
 	async function load_curriculum(params) {
-		template.querySelector('.teacher-curriculum-list').innerHTML = '';
+		template.querySelector('.teacher-curriculum-list').innerHTML = `
+		<h3 class="list-heading">Danh sách Lịch báo giảng</h3>
+		`;
 		let status = '',
 				text_color = '',
 				text_btn = '';
@@ -129,9 +135,12 @@ export async function render(params) {
 			div.innerHTML = `
 			<p>
 				<b class="d-block mb-4">Tuần ${item.week.name}</b>
-				<span class="text-secondary">Từ ${item.week.start_date} đến ${item.week.end_date}</span>
+				<span>Từ ${format_date(item.week.start_date)} đến ${format_date(item.week.end_date)}</span>
 			</p>
-			<b class="${text_color} mr-auto">${status}</b>
+			<div class="mr-auto">
+				<span class="d-block mb-4">Trạng thái</span>
+				<b class="${text_color}">${status}</b>
+			</div>
 			<button class="btn btn-primary">${text_btn}</button>
 			`;
 			
@@ -147,6 +156,7 @@ export async function render(params) {
 			
 			template.querySelector('.teacher-curriculum-list').appendChild(div);
 		});
+		await remove_loader();
 	}
 	
 	async function load_week_list(params) {
@@ -175,7 +185,6 @@ export async function render(params) {
 			loader();
 			await load_week_list(params);
 			await load_curriculum(params);
-			await remove_loader();
 		}
 	});
 	

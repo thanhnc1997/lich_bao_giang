@@ -201,6 +201,14 @@ export async function check_expried_token(params) {
 	}
 }
 
+export function format_date(date) {
+	let year = date.split('-')[0],
+			month = date.split('-')[1],
+			day = date.split('-')[2];
+	
+	return day + '/' + month + '/' + year;
+}
+
 export async function input_required_check(params) {
 	let {dom} = params;
 	let require_list = dom.querySelectorAll('[required]');

@@ -7,11 +7,14 @@ import {
 	day_translate,
 	loader,
 	remove_loader,
+	format_date
 } from '../../helper.js';
 
 export async function render(params) {
 	let {callback, user, detail} = params;
 	let date_list = [],
+			classes_list = [],
+			subjects_list = [],
 			date_session = 'morning',
 			current_day = '',
 			empty_period = false,
@@ -61,7 +64,7 @@ export async function render(params) {
 				}
 				item.classList.add('active');
 				current_day = day;
-				await load_period({day: current_day, date_session: date_session});
+				await load_session({day: current_day});
 				
 				if (date_session == 'morning') {
 					template.querySelector('.modal .period').appendChild(await load_period_detail(create_obj[current_day][date_session][morning_p[0]]));
@@ -75,12 +78,55 @@ export async function render(params) {
 			template.querySelector('#days').appendChild(item);
 			template.querySelector('#days .tag-item').classList.add('active');
 		});
-		console.log(create_obj);
+		
+		await load_session({day: current_day});
+	}
+	
+	async function load_session(params) {
+		let {day} = params;
+		template.querySelector('#session').innerHTML = `
+		<span class="tag-item" data-session="morning">Sáng</span>
+		<span class="tag-item" data-session="afternoon">Chiều</span>
+		`;
+		
+		if (Object.keys(create_obj[day]['morning']).length) {
+			date_session = 'morning';
+			template.querySelector('#session [data-session="morning"]').classList.add('active');
+			template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][morning_p[0]]));
+		}
+		
+		if (!Object.keys(create_obj[day]['morning']).length && Object.keys(create_obj[day]['afternoon']).length) {
+			date_session = 'afternoon';
+			template.querySelector('#session [data-session="afternoon"]').classList.add('active');
+			template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][afternoon_p[0]]));
+		}
+		
+		await load_period({day: day, date_session: date_session});
+		
+		template.querySelectorAll('#session .tag-item').forEach(item => {
+			item.addEventListener('click', async (e) => {
+				template.querySelector('#period').innerHTML = '';
+				template.querySelector('#session .tag-item.active').classList.remove('active');
+				item.classList.add('active');
+				date_session = e.currentTarget.getAttribute('data-session');
+				
+				if (date_session == 'morning') {
+					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][morning_p[0]]));
+				}
+				
+				if (date_session == 'afternoon') {
+					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][afternoon_p[0]]));
+				}
+			});
+		});
 	}
 	
 	async function load_period(params) {
 		template.querySelector('#period').innerHTML = '';
 		let {day, date_session} = params;
+		let first_key = Object.keys(create_obj[day][date_session])[0];
+		template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][first_key]));
+		
 		for (let [k, v] of Object.entries(create_obj[day][date_session])) {
 			let span = create_element('span');
 			span.classList.add('tag-item', 'square');
@@ -114,8 +160,8 @@ export async function render(params) {
 		let {day, subject, component_id, empty_period} = params;
 		
 		div.innerHTML = `
-		<h4 style="padding: 16px; background: #EBFAFF;">
-			Ngày ${day.date}
+		<h4 style="padding: 12px 16px; background: #EBFAFF;">
+			Ngày ${format_date(day.date)}
 		</h4>
 		<div style="padding: 16px;">
 			<div class="grid grid-3 gap-14 mb-14">
@@ -144,15 +190,15 @@ export async function render(params) {
 				<label class="label required">Chuẩn bị điều chỉnh (TN, hoặc thay tiết dạy)</label>
 				<input class="input" placeholder="Nội dung">
 			</div>
-			<div class="mb-14" id="note" style="display: none;">
-				<input class="input" placeholder="Lý do trống tiết" name="note">
-			</div>
-			<div class="d-flex align-items-center">
+			<div class="d-flex align-items-center mb-14">
 				<b class="mr-auto">Tiết trống</b>
 				<label class="switch">
 					<input type="checkbox" name="empty_period">
 					<span class="slider"></span>
 				</label>
+			</div>
+			<div id="note" style="display: none;">
+				<input class="input" placeholder="Lý do trống tiết" name="note">
 			</div>
 		</div>
 		`;
@@ -169,47 +215,59 @@ export async function render(params) {
 			}
 		});
 		
-		await fetch_data({
-			method: 'GET',
-			url: API_URL + API_END_POINT.classes,
-			auth: user.access_token,
-			async callback(params) {
-				params.map(item => {
-					let option = create_element('option');
-					option.innerHTML = item.name;
-					if (item.name == _class.name) option.setAttribute('selected', 'selected');
-					
-					div.querySelector('select[name="classes"]').appendChild(option);
-				});
-			} 
+		classes_list.map(item => {
+			let option = create_element('option');
+			option.innerHTML = item.name;
+			if (item.name == _class.name) option.setAttribute('selected', 'selected');
+
+			div.querySelector('select[name="classes"]').appendChild(option);
 		});
 		
-		await fetch_data({
-			method: 'GET',
-			url: API_URL + API_END_POINT.subjects,
-			auth: user.access_token,
-			async callback(params) {
-				params.map(item => {
-					let option = create_element('option');
-					option.innerHTML = item.name;
-					if (item.name == subject.name) option.setAttribute('selected', 'selected');
-					
-					div.querySelector('select[name="subjects"]').appendChild(option);
-				});
-			} 
+		subjects_list.map(item => {
+			let option = create_element('option');
+			option.innerHTML = item.name;
+			if (item.name == subject.name) option.setAttribute('selected', 'selected');
+
+			div.querySelector('select[name="subjects"]').appendChild(option);
 		});
 		
 		return div;
 	}
 	
 	async function modal_header() {
+		let status = '',
+				text_color = '';
+		
+		if (detail.status == 0) {
+			status = 'Thiếu';
+			text_color = 'text-danger';
+		}
+
+		if (detail.status == 1) {
+			status = 'Chờ duyệt';
+			text_color = 'text-warning';
+		}
+
+		if (detail.status == 2) {
+			status = 'Đã duyệt';
+			text_color = 'text-success';
+		}
+		
 		let div = create_element('div');
 		div.classList.add('modal-header', 'd-flex', 'align-items-center');
 		div.innerHTML = `
 		<button class="btn back">${render_icon.arrow_left({})}</button>
-		<h3>
+		<h3 style="flex-grow: 1;">
 			<p class="mb-4">Nộp lịch báo giảng</p>
-			<small style="font-weight: normal;">Tuần ${detail.id} - (${detail.week.start_date} - ${detail.week.end_date})</small>
+			<small class="d-flex align-items-center" style="font-weight: normal;">
+				<span class="mr-auto">
+					Tuần ${detail.id} (${format_date(detail.week.start_date)} - ${format_date(detail.week.end_date)})
+				</span>
+				<span>
+					<span class="mr-8">Trạng thái</span>
+					<b class="${text_color}">${status}</b>
+				</span>
+			</small>
 		</h3>
 		`;
 		
@@ -231,39 +289,23 @@ export async function render(params) {
 				
 			</div>
 		</div>
-		<div class="schedule-row align-items-center">
-			<span>Buổi</span>
-			<div id="session" class="tag-list">
-				<span class="tag-item active" data-session="morning">Sáng</span>
-				<span class="tag-item" data-session="afternoon">Chiều</span>
+		<div class="grid grid-md-2">
+			<div class="schedule-row align-items-center">
+				<span>Buổi</span>
+				<div id="session" class="tag-list">
+					
+				</div>
 			</div>
-		</div>
-		<div class="schedule-row align-items-center">
-			<span>Tiết</span>
-			<div id="period" class="tag-list">
-				
+			
+			<div class="schedule-row align-items-center">
+				<span>Tiết</span>
+				<div id="period" class="tag-list">
+
+				</div>
 			</div>
 		</div>
 		<div class="period"></div>
 		`;
-		
-		div.querySelectorAll('#session .tag-item').forEach(day => {
-			day.addEventListener('click', async (e) => {
-				div.querySelector('#session .tag-item.active').classList.remove('active');
-				day.classList.add('active');
-				date_session = e.currentTarget.getAttribute('data-session');
-				
-				load_period({day: current_day, date_session: date_session});
-				
-				if (date_session == 'morning') {
-					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[current_day][date_session][morning_p[0]]));
-				}
-				
-				if (date_session == 'afternoon') {
-					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[current_day][date_session][afternoon_p[0]]));
-				}
-			});
-		});
 		
 		return div;
 	}
@@ -285,18 +327,35 @@ export async function render(params) {
 		return div;
 	}
 	
+	template.appendChild(await modal_header());
+	template.appendChild(await modal_body());
+	template.appendChild(await modal_footer());
+	
+	await fetch_data({
+		method: 'GET',
+		url: API_URL + API_END_POINT.classes,
+		auth: user.access_token,
+		async callback(params) {
+			classes_list = [...params];
+		} 
+	});
+
+	await fetch_data({
+		method: 'GET',
+		url: API_URL + API_END_POINT.subjects,
+		auth: user.access_token,
+		async callback(params) {
+			subjects_list = [...params];
+		} 
+	});
+	
 	await fetch_data({
 		method: 'GET',
 		url: API_URL + API_END_POINT.schedules + '/' + detail.id + '/periods',
 		auth: user.access_token,
 		async callback(params) {
-			template.appendChild(await modal_header());
-			template.appendChild(await modal_body());
-			template.appendChild(await modal_footer());
-			
 			await format_period_list(params);
-			await load_period({day: current_day, date_session:date_session});
-			template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[current_day][date_session][morning_p[0]]));
+			await load_period({day: current_day, date_session: date_session});
 			await remove_loader();
 		}
 	});
