@@ -268,7 +268,7 @@ button {
 
 select,
 .select {
-  background: #fff url("../images/carret_down.png") no-repeat right center !important; }
+  background: #fff url("../images/caret_down.svg") no-repeat right center !important; }
 
 ul {
   list-style: none; }
@@ -870,7 +870,6 @@ hr {
     cursor: pointer;
     display: inline-block;
     margin-right: 4px;
-    color: #999;
     border-radius: 4px;
     padding: 8px; }
     .tag-list .tag-item:last-child {

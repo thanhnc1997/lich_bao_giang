@@ -15,7 +15,7 @@ export async function render(params) {
 	const template = await create_element('section');
 	template.classList.add('home-page');
 	template.innerHTML = `
-	<div class="side-nav rounded-8 overflow-hidden"></div>
+	<div class="side-nav overflow-hidden"></div>
 	<div class="page-content"></div>
 	`;
 	
@@ -63,7 +63,7 @@ export async function render(params) {
 	
 	async function nav_status_filter() {
 		let div = create_element('div');
-		div.classList.add('nav', 'rounded-8');
+		div.classList.add('nav');
 		div.innerHTML = `
 		<div class="tag-list">
 			<span class="tag-item active">Tất cả</span>
@@ -108,24 +108,28 @@ export async function render(params) {
 		<h3 class="list-heading">Danh sách Lịch báo giảng</h3>
 		`;
 		let status = '',
+				type = '',
 				text_color = '',
 				text_btn = '';
 		
 		params.map(item => {
 			if (item.status == 0) {
 				status = 'Thiếu';
+				type = 'create';
 				text_color = 'text-danger';
 				text_btn = 'Nộp';
 			}
 			
 			if (item.status == 1) {
 				status = 'Chờ duyệt';
+				type = 'update';
 				text_color = 'text-warning';
 				text_btn = 'Sửa';
 			}
 			
 			if (item.status == 2) {
 				status = 'Đã duyệt';
+				type = 'complete';
 				text_color = 'text-success';
 				text_btn = 'Xem';
 			}
@@ -135,7 +139,7 @@ export async function render(params) {
 			div.innerHTML = `
 			<p>
 				<b class="d-block mb-4">Tuần ${item.week.name}</b>
-				<span>Từ ${format_date(item.week.start_date)} đến ${format_date(item.week.end_date)}</span>
+				<span>${format_date(item.week.start_date)} đến ${format_date(item.week.end_date)}</span>
 			</p>
 			<div class="mr-auto">
 				<span class="d-block mb-4">Trạng thái</span>
@@ -148,7 +152,7 @@ export async function render(params) {
 				loader();
 				let modal = await import('../detail_page.js');
 				document.body.appendChild(await modal.render({
-					type: 'create',
+					type: type,
 					user: user,
 					data: item
 				}));
@@ -161,17 +165,28 @@ export async function render(params) {
 	
 	async function load_week_list(params) {
 		let status = '',
-				text_color = ''
+				type = '';
+		
+		if (status == 0) type = 'create';
+		if (status == 1) type = 'update';
+		if (status == 2) type = 'complete';
 		
 		params.map(item => {
 			let div = create_element('span');
 			div.classList.add('tag-item', 'square');
 			div.innerHTML = item.week.name;
-			div.addEventListener('click', (e) => {
+			div.addEventListener('click', async (e) => {
 				if (template.querySelector('.date-nav .tag-list .tag-item.active')) {
 					template.querySelector('.date-nav .tag-list .tag-item.active').classList.remove('active')
 				}
 				e.currentTarget.classList.add('active');
+				loader();
+				let modal = await import('../detail_page.js');
+				document.body.appendChild(await modal.render({
+					type: type,
+					user: user,
+					data: item
+				}));
 			});
 			
 			template.querySelector('.tag-list').appendChild(div);
