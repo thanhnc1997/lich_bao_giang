@@ -40,31 +40,91 @@ body {
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
-	// background: #F5F5F5;
-	background: #EBFAFF;
+	background: url(../images/bg.png) no-repeat center;
+	background-size: cover;
+	// background: #EBFAFF;
 }
 
 #app {
-	max-width: 991px;
+	max-width: 1600px;
 	width: 100%;
 	min-height: 100vh;
 	margin: 0 auto;
+	
+	@media (min-width: 991px) {
+		padding: 0 28px;
+	}
+}
+
+.main-nav {
+	display: none;
+	max-height: calc(100vh - 56px);
+	background: rgba(255, 255, 255, .4);
+	box-shadow: 0 4px 30px rgba(0, 0, 0, .1);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, .4);
+	border-radius: 18px;
+	padding: 16px;
+	position: fixed;
+	left: 28px;
+	top: 28px;
+	
+	@media (min-width: 991px) {
+		display: block;
+		width: 280px;
+	}
+	
+	.profile {
+		display: grid;
+		grid-template: 38px / 38px auto;
+		grid-gap: 10px;
+		margin-bottom: 28px;
+	}
+	
+	.ava {
+		border-radius: 50%;
+		background: #62EEAB;
+		position: relative;
+		
+		.text {
+			position: absolute;
+			font-size: 18px;
+			font-weight: 600;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+	}
+	
+	ul {
+		padding: 0 0 8px;
+	}
+	
+	.nav-item {
+		padding: 14px 16px;
+		border-radius: 6px;
+		display: flex;
+		align-items: center;
+		
+		&.active {
+			color: #03177E;
+			background: #C3E6FF;
+			font-weight: 600;
+		}
+	}
 }
 
 .template-wrapper {
 	@media (min-width: 991px) {
-		margin: 28px auto;
-		display: flex;
+		margin: 28px auto 28px 320px;
 		min-height: calc(100vh - 56px);
 		max-height: calc(100vh - 56px);
-		overflow: auto;
-		border-radius: 24px;
-		
-		background: rgba(255, 255, 255, .2);
+		background: rgba(255, 255, 255, .4);
 		box-shadow: 0 4px 30px rgba(0, 0, 0, .1);
-		backdrop-filter: blur(20px);
-		-webkit-backdrop-filter: blur(20px);
 		border: 1px solid rgba(255, 255, 255, .4);
+		border-radius: 24px;
+		overflow: auto;
 	}
 }
 
@@ -414,7 +474,7 @@ hr {
 .btn {
 	text-align: center;
 	cursor: pointer;
-	border-radius: 4px;
+	border-radius: 6px;
 	color: #000;
 	border: 0;
 	font-weight: 500;
@@ -903,7 +963,7 @@ hr {
 		width: 100%;
 		
 		@media (min-width: 991px) {
-			background: $grey4;
+			background: $grey5;
 			border-radius: 100px;
 			padding: 0 12px;
 		}

@@ -3,6 +3,8 @@ import {
 	render_icon
 } from '../helper.js';
 
+import main_nav from '../components/main_nav.js';
+
 export async function render() {
 	const template = await create_element('div');
 	template.classList.add('template-wrapper');
@@ -23,6 +25,7 @@ export async function render() {
 		block = await import('./listing/teacher_listing.js');
 	}
 	
+	template.appendChild(await main_nav({user: user_profile}));
 	template.appendChild(await block.render({user: user_profile}));
 	
 	return template;

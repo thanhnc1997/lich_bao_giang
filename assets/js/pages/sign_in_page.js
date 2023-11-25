@@ -16,9 +16,11 @@ export async function render() {
 	template.classList.add('sign-in-page');
 	
 	async function handle_sign_in(params) {
+		console.log(params)
 		localStorage.setItem('user', JSON.stringify({
 			role: params.user.role,
-			access_token: params.accessToken
+			access_token: params.accessToken,
+			full_name: params.user.fullname
 		}));
 		location.reload();
 	}
@@ -36,7 +38,7 @@ export async function render() {
 				<label class="label">Mật khẩu</label>
 				<input class="input" type="password" placeholder="Mật khẩu" name="password">
 			</div>
-			<button class="btn" style="background: #F4F4F4;">${render_icon.show({})}</button>
+			<button class="btn" style="background: #E1E1E1;">${render_icon.show({})}</button>
 		</div>
 		<button class="btn btn-primary">Đăng nhập</button>
 		`;

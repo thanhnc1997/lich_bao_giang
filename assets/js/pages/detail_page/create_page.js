@@ -28,6 +28,7 @@ export async function render(params) {
 	async function format_period_list(params) {
 		params.map(item => {
 			date_list.push(item.day.date);
+			date_list.sort();
 			
 			create_obj[item.day.date] = {
 				morning: {},
@@ -80,6 +81,7 @@ export async function render(params) {
 		});
 		
 		await load_session({day: current_day});
+		console.log(create_obj)
 	}
 	
 	async function load_session(params) {
@@ -109,6 +111,7 @@ export async function render(params) {
 				template.querySelector('#session .tag-item.active').classList.remove('active');
 				item.classList.add('active');
 				date_session = e.currentTarget.getAttribute('data-session');
+				await load_period({day: day, date_session: date_session});
 				
 				if (date_session == 'morning') {
 					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][morning_p[0]]));
@@ -157,7 +160,7 @@ export async function render(params) {
 		}
 		
 		let _class = params.class;
-		let {day, subject, component_id, empty_period} = params;
+		let {day, subject, component, empty_period} = params;
 		
 		div.innerHTML = `
 		<h4 style="padding: 12px 16px; background: #EBFAFF;">
@@ -167,7 +170,7 @@ export async function render(params) {
 			<div class="grid grid-3 gap-14 mb-14">
 				<div>
 					<label class="label required">Tiết PPTC</label>
-					<input class="input" name="component_id" value="${component_id}" disabled>
+					<input class="input" name="component_id" value="${component.id}" disabled>
 				</div>
 				<div>
 					<label class="label required">Lớp</label>
@@ -184,7 +187,7 @@ export async function render(params) {
 			</div>
 			<div class="mb-14">
 				<label class="label required">Tên bài dạy</label>
-				<input class="input" placeholder="Điền tên bài dạy">
+				<input class="input" placeholder="Điền tên bài dạy" value="${component.name}">
 			</div>
 			<div class="mb-14">
 				<label class="label required">Chuẩn bị điều chỉnh (TN, hoặc thay tiết dạy)</label>
@@ -315,7 +318,7 @@ export async function render(params) {
 		div.classList.add('modal-footer', 'grid', 'grid-2', 'gap-12');
 		div.innerHTML = `
 		<button class="btn btn-light">Hủy</button>
-		<button class="btn btn-primary">Lưu</button>
+		<button class="btn btn-primary">Nộp LBG</button>
 		`;
 		
 		div.querySelectorAll('.btn').forEach(btn => {

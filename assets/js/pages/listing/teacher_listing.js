@@ -38,8 +38,8 @@ export async function render(params) {
 		div.innerHTML = `
 		<div class="date-select align-items-center cursor-pointer">
 			<select class="select mr-auto">
-				<option value="2023" selected>Năm 2023</option>
-				<option value="2024">Năm 2024</option>
+				<option value="2023" selected>2023 - 2024</option>
+				<option value="2024">2024 - 2025</option>
 			</select>
 			<span>Tuần</span>
 		</div>
@@ -167,6 +167,12 @@ export async function render(params) {
 			let div = create_element('span');
 			div.classList.add('tag-item', 'square');
 			div.innerHTML = item.week.name;
+			div.addEventListener('click', (e) => {
+				if (template.querySelector('.date-nav .tag-list .tag-item.active')) {
+					template.querySelector('.date-nav .tag-list .tag-item.active').classList.remove('active')
+				}
+				e.currentTarget.classList.add('active');
+			});
 			
 			template.querySelector('.tag-list').appendChild(div);
 		});
