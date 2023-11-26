@@ -10,6 +10,7 @@ import {
 } from '../../helper.js';
 
 export async function render(params) {
+	let query_string = '?';
 	let {user} = params;
 	
 	const template = await create_element('section');
@@ -62,21 +63,41 @@ export async function render(params) {
 	}
 	
 	async function nav_status_filter() {
+		let data_status = '';
+		
 		let div = create_element('div');
 		div.classList.add('nav');
 		div.innerHTML = `
 		<div class="tag-list">
-			<span class="tag-item active">Tất cả</span>
-			<span class="tag-item">Đã duyệt</span>
-			<span class="tag-item">Chờ duyệt</span>
-			<span class="tag-item">Thiếu</span>
+			<span data-status="all" class="tag-item active">Tất cả</span>
+			<span data-status="0" class="tag-item">Thiếu</span>
+			<span data-status="1" class="tag-item">Chờ duyệt</span>
+			<span data-status="2" class="tag-item">Đã duyệt</span>
 		</div>
 		`;
 		
 		div.querySelectorAll('.tag-item').forEach(tag => {
-			tag.addEventListener('click', e => {
+			tag.addEventListener('click', async (e) => {
 				div.querySelector('.tag-item.active').classList.remove('active');
 				e.currentTarget.classList.add('active');
+				if (e.currentTarget.getAttribute('data-status') == 'all') {
+					data_status = '';
+				}
+				else {
+					data_status = `status=${e.currentTarget.getAttribute('data-status')}`;
+				}
+				
+				query_string += data_status;
+				await fetch_data({
+					method: 'GET',
+					url: API_URL + API_END_POINT.schedules + '/find' + query_string,
+					auth: user.access_token,
+					async callback(params) {
+						loader();
+						await load_week_list(params);
+						await load_curriculum(params);
+					}
+				});
 			});
 		});
 		
@@ -86,31 +107,30 @@ export async function render(params) {
 	async function list_curriculum() {
 		let div = create_element('div');
 		div.classList.add('teacher-curriculum-list');
-		div.innerHTML = `
-		<h3>Danh sách Lịch báo giảng</h3>
-		`;
-		
-		div.querySelectorAll('.btn').forEach(btn => {
-			btn.addEventListener('click', async (e) => {
-				let modal = await import('../detail_page.js');
-				document.body.appendChild(await modal.render({
-					type: 'create',
-					user: user
-				}));
-			});
-		});
 		
 		return div;
 	}
 	
 	async function load_curriculum(params) {
-		template.querySelector('.teacher-curriculum-list').innerHTML = `
-		<h3 class="list-heading">Danh sách Lịch báo giảng</h3>
-		`;
 		let status = '',
 				type = '',
 				text_color = '',
 				text_btn = '';
+		
+		template.querySelector('.teacher-curriculum-list').innerHTML = `
+		<h3 class="list-heading">Danh sách Lịch báo giảng</h3>
+		`;
+		
+		if (!params) {
+			let blank = create_element('div');
+			blank.innerHTML = `
+			<p class="text-center" style="padding: 16px; margin: 16px; background: #F4F4F4; border-radius: 12px;">
+				<b>Không có dữ liệu</b>
+			</p>
+			`;
+			template.querySelector('.teacher-curriculum-list').appendChild(blank);
+			return false;
+		}
 		
 		params.map(item => {
 			if (item.status == 0) {

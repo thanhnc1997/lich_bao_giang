@@ -167,7 +167,7 @@ export async function render(params) {
 			Ngày ${format_date(day.date)}
 		</h4>
 		<div style="padding: 16px;">
-			<div class="grid grid-3 gap-14 mb-14">
+			<div class="grid grid-3 gap-14 mb-12">
 				<div>
 					<label class="label required">Tiết PPTC</label>
 					<input class="input" name="component_id" value="${component.id}" disabled>
@@ -185,15 +185,15 @@ export async function render(params) {
 					</select>
 				</div>
 			</div>
-			<div class="mb-14">
+			<div class="mb-12">
 				<label class="label required">Tên bài dạy</label>
 				<input class="input" placeholder="Điền tên bài dạy" value="${component.name}">
 			</div>
-			<div class="mb-14">
+			<div class="mb-12">
 				<label class="label required">Chuẩn bị điều chỉnh (TN, hoặc thay tiết dạy)</label>
 				<input class="input" placeholder="Nội dung">
 			</div>
-			<div class="d-flex align-items-center mb-14">
+			<div class="d-flex align-items-center mb-12">
 				<b class="mr-auto">Tiết trống</b>
 				<label class="switch">
 					<input type="checkbox" name="empty_period">
@@ -261,15 +261,11 @@ export async function render(params) {
 		div.innerHTML = `
 		<button class="btn back">${render_icon.arrow_left({})}</button>
 		<h3 style="flex-grow: 1;">
-			<p class="mb-4">Nộp lịch báo giảng</p>
-			<small class="d-flex align-items-center" style="font-weight: normal;">
-				<span class="mr-auto">
-					Tuần ${detail.id} (${format_date(detail.week.start_date)} - ${format_date(detail.week.end_date)})
-				</span>
-				<span>
-					<span class="mr-8">Trạng thái</span>
-					<b class="${text_color}">${status}</b>
-				</span>
+			<p class="mb-4">
+				Tuần ${detail.id} (${format_date(detail.week.start_date)} - ${format_date(detail.week.end_date)})
+			</p>
+			<small style="font-weight: normal;">
+				Trạng thái  <b class="${text_color}">${status}</b>
 			</small>
 		</h3>
 		`;
@@ -287,21 +283,21 @@ export async function render(params) {
 		div.style.cssText = 'padding: 0;';
 		div.innerHTML = `
 		<div class="schedule-row align-items-center">
-			<span>Thứ</span>
+			<b>Thứ</b>
 			<div id="days" class="tag-list">
 				
 			</div>
 		</div>
 		<div class="grid grid-md-2">
 			<div class="schedule-row align-items-center">
-				<span>Buổi</span>
+				<b>Buổi</b>
 				<div id="session" class="tag-list">
 					
 				</div>
 			</div>
 			
 			<div class="schedule-row align-items-center">
-				<span>Tiết</span>
+				<b>Tiết</b>
 				<div id="period" class="tag-list">
 
 				</div>
