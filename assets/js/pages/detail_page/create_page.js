@@ -11,7 +11,7 @@ import {
 } from '../../helper.js';
 
 export async function render(params) {
-	let {_callback, user, detail, load_list} = params;
+	let {callback, user, detail, load_list} = params;
 	let date_list = [],
 			classes_list = [],
 			subjects_list = [],
@@ -298,7 +298,7 @@ export async function render(params) {
 		`;
 		
 		div.querySelector('.btn').addEventListener('click', async () => {
-			await _callback();
+			await callback();
 		});
 		
 		return div;
@@ -341,12 +341,12 @@ export async function render(params) {
 		div.classList.add('modal-footer', 'grid', 'grid-2', 'gap-12');
 		div.innerHTML = `
 		<button class="btn btn-light">Hủy</button>
-		<button class="btn btn-primary">Nộp LBG</button>
+		<button class="btn btn-primary">${detail.status == 0 ? 'Nộp LBG' : 'Cập nhật LBG'}</button>
 		`;
 		
 		div.querySelectorAll('.btn').forEach(btn => {
 			btn.addEventListener('click', async () => {
-				await _callback();
+				await callback();
 			});
 		});
 		

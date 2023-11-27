@@ -10,7 +10,8 @@ import {
 } from '../../helper.js';
 
 export async function render(params) {
-	let status_query_param = 'status=';
+	let status_query_param = '';
+	let year_query_param = '';
 	
 	let {user} = params;
 	
@@ -41,8 +42,8 @@ export async function render(params) {
 		div.innerHTML = `
 		<div class="date-select align-items-center cursor-pointer">
 			<select class="select mr-auto">
-				<option value="2023" selected>2023 - 2024</option>
-				<option value="2024">2024 - 2025</option>
+				<option value="2023,2024" selected>2023 - 2024</option>
+				<option value="2024,2025">2024 - 2025</option>
 			</select>
 			<span>Tuần</span>
 		</div>
@@ -54,10 +55,17 @@ export async function render(params) {
 		</div>
 		`;
 		
-		div.querySelectorAll('.tag-item').forEach(tag => {
-			tag.addEventListener('click', e => {
-				div.querySelector('.tag-item.active').classList.remove('active');
-				e.currentTarget.classList.add('active');
+		div.querySelector('.select').addEventListener('change', async (e) => {
+			year_query_param = 'year=' + e.target.value;
+			await fetch_data({
+				method: 'GET',
+				url: API_URL + API_END_POINT.schedules + '/find?' + status_query_param + '&' + year_query_param,
+				auth: user.access_token,
+				async callback(params) {
+					loader();
+					await load_week_list(params);
+					await load_curriculum(params);
+				}
 			});
 		});
 		
@@ -84,7 +92,7 @@ export async function render(params) {
 					status_query_param = 'status=' + e.currentTarget.getAttribute('data-status');
 					await fetch_data({
 						method: 'GET',
-						url: API_URL + API_END_POINT.schedules + '/find?' + status_query_param,
+						url: API_URL + API_END_POINT.schedules + '/find?' + status_query_param + '&' + year_query_param,
 						auth: user.access_token,
 						async callback(params) {
 							loader();
@@ -94,6 +102,7 @@ export async function render(params) {
 					});
 				}
 				else {
+					status_query_param = '';
 					await fetch_data({
 						method: 'GET',
 						url: API_URL + API_END_POINT.schedules,
@@ -174,10 +183,9 @@ export async function render(params) {
 			`;
 			
 			div.querySelector('.btn').addEventListener('click', async (e) => {
-				if (item.status == 0) type = 'create';
-				if (item.status == 1) type = 'update';
+				if (item.status == 0 || item.status == 1) type = 'create';
 				if (item.status == 2) type = 'complete';
-				loader();
+				
 				let modal = await import('../detail_page.js');
 				document.body.appendChild(await modal.render({
 					type: type,
@@ -210,10 +218,9 @@ export async function render(params) {
 					template.querySelector('.date-nav .tag-list .tag-item.active').classList.remove('active')
 				}
 				e.currentTarget.classList.add('active');
-				if (item.status == 0) type = 'create';
-				if (item.status == 1) type = 'update';
+				if (item.status == 0 || item.status == 1) type = 'create';
 				if (item.status == 2) type = 'complete';
-				loader();
+				
 				let modal = await import('../detail_page.js');
 				document.body.appendChild(await modal.render({
 					type: type,

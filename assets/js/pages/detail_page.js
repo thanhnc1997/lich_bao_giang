@@ -1,5 +1,7 @@
 import {
-	create_element
+	create_element,
+	loader,
+	remove_loader
 } from '../helper.js';
 
 export async function render(params) {
@@ -15,6 +17,8 @@ export async function render(params) {
 		
 	</div>
 	`;
+	loader();
+	if (!params || !type || !user || !data) remove_loader();
 	
 	template.querySelector('.overlay').addEventListener('click', () => {
 		remove_template();
