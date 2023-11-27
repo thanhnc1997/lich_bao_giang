@@ -300,7 +300,7 @@ export async function fetch_data(params) {
 		if(data.status && data.status == 400) {
 			toast({
 				type: 'danger',
-				message: data.message
+				message: data.message.name
 			})
 			return false;
 		}

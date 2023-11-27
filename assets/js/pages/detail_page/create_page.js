@@ -11,16 +11,16 @@ import {
 } from '../../helper.js';
 
 export async function render(params) {
-	let {callback, user, detail} = params;
+	let {_callback, user, detail, load_list} = params;
 	let date_list = [],
 			classes_list = [],
 			subjects_list = [],
 			date_session = 'morning',
 			current_day = '',
 			empty_period = false,
-			morning_p = [],
-			afternoon_p = [],
 			create_obj = {};
+	
+	let period_update = {}
 	
 	const template = await create_element('div');
 	template.classList.add('modal-content');
@@ -34,6 +34,20 @@ export async function render(params) {
 				morning: {},
 				afternoon: {}
 			}
+			
+			let updated_key = item.day.date + '-' + item.day.session + '-' + item.timetable_id;
+			period_update[updated_key] = {
+				day_id: item.day.id,
+				schedule_id: item.schedule.id,
+				component_id: item.component.id,
+				class_id: item.class.id,
+				subject_id: item.subject.id,
+				timetable_id: item.timetable_id,
+				name: item.component.name,
+				adjustment: '',
+				note: '',
+				empty_period: false
+			}
 		});
 		
 		current_day = date_list[0];
@@ -45,12 +59,10 @@ export async function render(params) {
 			params.map((item, i) => {
 				if (item.day.date == k && item.day.session == true) {
 					create_obj[k]['morning'][item.timetable_id] = item;
-					morning_p.push(item.timetable_id);
 				}
 				
 				if (item.day.date == k && item.day.session == false) {
 					create_obj[k]['afternoon'][item.timetable_id] = item;
-					afternoon_p.push(item.timetable_id);
 				}
 			});
 		}
@@ -66,14 +78,6 @@ export async function render(params) {
 				item.classList.add('active');
 				current_day = day;
 				await load_session({day: current_day});
-				
-				if (date_session == 'morning') {
-					template.querySelector('.modal .period').appendChild(await load_period_detail(create_obj[current_day][date_session][morning_p[0]]));
-				}
-				
-				if (date_session == 'afternoon') {
-					template.querySelector('.modal .period').appendChild(await load_period_detail(create_obj[current_day][date_session][afternoon_p[0]]));
-				}
 			});
 			
 			template.querySelector('#days').appendChild(item);
@@ -82,6 +86,7 @@ export async function render(params) {
 		
 		await load_session({day: current_day});
 		console.log(create_obj)
+		console.log(period_update)
 	}
 	
 	async function load_session(params) {
@@ -94,13 +99,11 @@ export async function render(params) {
 		if (Object.keys(create_obj[day]['morning']).length) {
 			date_session = 'morning';
 			template.querySelector('#session [data-session="morning"]').classList.add('active');
-			template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][morning_p[0]]));
 		}
 		
 		if (!Object.keys(create_obj[day]['morning']).length && Object.keys(create_obj[day]['afternoon']).length) {
 			date_session = 'afternoon';
 			template.querySelector('#session [data-session="afternoon"]').classList.add('active');
-			template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][afternoon_p[0]]));
 		}
 		
 		await load_period({day: day, date_session: date_session});
@@ -111,15 +114,10 @@ export async function render(params) {
 				template.querySelector('#session .tag-item.active').classList.remove('active');
 				item.classList.add('active');
 				date_session = e.currentTarget.getAttribute('data-session');
+				let k = Object.keys(create_obj[day][date_session])[0];
 				await load_period({day: day, date_session: date_session});
 				
-				if (date_session == 'morning') {
-					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][morning_p[0]]));
-				}
-				
-				if (date_session == 'afternoon') {
-					template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][afternoon_p[0]]));
-				}
+				template.querySelector('.modal-body .period').appendChild(await load_period_detail(create_obj[day][date_session][k]));
 			});
 		});
 	}
@@ -133,6 +131,7 @@ export async function render(params) {
 		for (let [k, v] of Object.entries(create_obj[day][date_session])) {
 			let span = create_element('span');
 			span.classList.add('tag-item', 'square');
+			span.setAttribute('data-period', v.day.date + '-' + v.day.session + '-' + v.timetable_id);
 			span.innerHTML = k;
 			span.addEventListener('click', async () => {
 				if (template.querySelector('#period .tag-item.active')) {
@@ -161,6 +160,7 @@ export async function render(params) {
 		
 		let _class = params.class;
 		let {day, subject, component, empty_period} = params;
+		let key = day.date + '-' + day.session + '-' + params.timetable_id;
 		
 		div.innerHTML = `
 		<h4 style="padding: 12px 16px; background: #EBFAFF;">
@@ -170,7 +170,7 @@ export async function render(params) {
 			<div class="grid grid-3 gap-14 mb-12">
 				<div>
 					<label class="label required">Tiết PPTC</label>
-					<input class="input" name="component_id" value="${component.id}" disabled>
+					<input class="input" name="component_id" value="${period_update[key]['component_id']}" disabled>
 				</div>
 				<div>
 					<label class="label required">Lớp</label>
@@ -187,11 +187,11 @@ export async function render(params) {
 			</div>
 			<div class="mb-12">
 				<label class="label required">Tên bài dạy</label>
-				<input class="input" placeholder="Điền tên bài dạy" value="${component.name}">
+				<input class="input" placeholder="Điền tên bài dạy" name="name" value="${period_update[key]['name']}">
 			</div>
 			<div class="mb-12">
 				<label class="label required">Chuẩn bị điều chỉnh (TN, hoặc thay tiết dạy)</label>
-				<input class="input" placeholder="Nội dung">
+				<input class="input" placeholder="Nội dung" name="adjustment" value="${period_update[key]['adjustment']}">
 			</div>
 			<div class="d-flex align-items-center mb-12">
 				<b class="mr-auto">Tiết trống</b>
@@ -216,12 +216,39 @@ export async function render(params) {
 			if (empty_period == false) {
 				div.querySelector('#note').style.display = 'none';
 			}
+			
+			period_update[key]['empty_period'] = empty_period;
+		});
+		
+		div.querySelector('input[name="adjustment"]').addEventListener('keyup', e => {
+			period_update[key]['adjustment'] = e.target.value;
+			create_obj[day.date][date_session][params.timetable_id]['adjustment'] = e.target.value;
+		});
+		
+		div.querySelector('input[name="name"]').addEventListener('keyup', e => {
+			period_update[key]['name'] = e.target.value;
+			create_obj[day.date][date_session][params.timetable_id]['name'] = e.target.value;
+		});
+		
+		div.querySelector('input[name="note"]').addEventListener('change', e => {
+			period_update[key]['note'] = e.target.value;
+			create_obj[day.date][date_session][params.timetable_id]['note'] = e.target.value;
+		});
+		
+		div.querySelector('select[name="classes"]').addEventListener('change', e => {
+			period_update[key]['class_id'] = e.target.value;
+			create_obj[day.date][date_session][params.timetable_id]['class']['id'] = e.target.value;
+		});
+		
+		div.querySelector('select[name="classes"]').addEventListener('change', e => {
+			period_update[key]['class_id'] = e.target.value;
+			create_obj[day.date][date_session][params.timetable_id]['subject']['id'] = e.target.value;
 		});
 		
 		classes_list.map(item => {
 			let option = create_element('option');
 			option.innerHTML = item.name;
-			if (item.name == _class.name) option.setAttribute('selected', 'selected');
+			if (item.id == period_update[key]['class_id']) option.setAttribute('selected', 'selected');
 
 			div.querySelector('select[name="classes"]').appendChild(option);
 		});
@@ -229,7 +256,7 @@ export async function render(params) {
 		subjects_list.map(item => {
 			let option = create_element('option');
 			option.innerHTML = item.name;
-			if (item.name == subject.name) option.setAttribute('selected', 'selected');
+			if (item.name == period_update[key]['subject_id']) option.setAttribute('selected', 'selected');
 
 			div.querySelector('select[name="subjects"]').appendChild(option);
 		});
@@ -271,7 +298,7 @@ export async function render(params) {
 		`;
 		
 		div.querySelector('.btn').addEventListener('click', async () => {
-			await callback();
+			await _callback();
 		});
 		
 		return div;
@@ -319,7 +346,21 @@ export async function render(params) {
 		
 		div.querySelectorAll('.btn').forEach(btn => {
 			btn.addEventListener('click', async () => {
-				await callback();
+				await _callback();
+			});
+		});
+		
+		div.querySelector('.btn.btn-primary').addEventListener('click', async () => {
+			await fetch_data({
+				method: 'PUT',
+				url: API_URL + API_END_POINT.schedules + '/' + detail.id + '/status',
+				body: {
+					status: 1
+				},
+				auth: user.access_token,
+				async callback() {
+					await load_list();
+				}
 			});
 		});
 		
@@ -354,7 +395,6 @@ export async function render(params) {
 		auth: user.access_token,
 		async callback(params) {
 			await format_period_list(params);
-			await load_period({day: current_day, date_session: date_session});
 			await remove_loader();
 		}
 	});

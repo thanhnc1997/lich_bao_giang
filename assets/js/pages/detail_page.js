@@ -3,7 +3,7 @@ import {
 } from '../helper.js';
 
 export async function render(params) {
-	let {type, user, data} = params;
+	let {type, user, data, _callback} = params;
 	let modal_template = '';
 	
 	document.body.classList.add('overflow-hidden');
@@ -15,6 +15,10 @@ export async function render(params) {
 		
 	</div>
 	`;
+	
+	template.querySelector('.overlay').addEventListener('click', () => {
+		remove_template();
+	})
 	
 	async function remove_template() {
 		template.remove();
@@ -32,6 +36,9 @@ export async function render(params) {
 			detail: data,
 			async callback() {
 				await remove_template();
+			},
+			async load_list() {
+				await _callback();
 			}
 		}));
 	}

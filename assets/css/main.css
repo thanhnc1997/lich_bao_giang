@@ -453,7 +453,7 @@ hr {
   background: #fff; }
   .input:disabled,
   .select:disabled {
-    background: #E1E1E1; }
+    background: #F4F4F4; }
   .input.error,
   .select.error {
     border-color: #f93154; }

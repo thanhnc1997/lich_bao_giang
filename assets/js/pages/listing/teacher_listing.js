@@ -10,7 +10,8 @@ import {
 } from '../../helper.js';
 
 export async function render(params) {
-	let query_string = '?';
+	let status_query_param = 'status=';
+	
 	let {user} = params;
 	
 	const template = await create_element('section');
@@ -19,6 +20,7 @@ export async function render(params) {
 	<div class="side-nav overflow-hidden"></div>
 	<div class="page-content"></div>
 	`;
+	loader();
 	
 	async function search_box() {
 		let div = create_element('div');
@@ -63,8 +65,6 @@ export async function render(params) {
 	}
 	
 	async function nav_status_filter() {
-		let data_status = '';
-		
 		let div = create_element('div');
 		div.classList.add('nav');
 		div.innerHTML = `
@@ -80,24 +80,31 @@ export async function render(params) {
 			tag.addEventListener('click', async (e) => {
 				div.querySelector('.tag-item.active').classList.remove('active');
 				e.currentTarget.classList.add('active');
-				if (e.currentTarget.getAttribute('data-status') == 'all') {
-					data_status = '';
+				if (e.currentTarget.getAttribute('data-status') != 'all') {
+					status_query_param = 'status=' + e.currentTarget.getAttribute('data-status');
+					await fetch_data({
+						method: 'GET',
+						url: API_URL + API_END_POINT.schedules + '/find?' + status_query_param,
+						auth: user.access_token,
+						async callback(params) {
+							loader();
+							await load_week_list(params);
+							await load_curriculum(params);
+						}
+					});
 				}
 				else {
-					data_status = `status=${e.currentTarget.getAttribute('data-status')}`;
+					await fetch_data({
+						method: 'GET',
+						url: API_URL + API_END_POINT.schedules,
+						auth: user.access_token,
+						async callback(params) {
+							loader();
+							await load_week_list(params);
+							await load_curriculum(params);
+						}
+					});
 				}
-				
-				query_string += data_status;
-				await fetch_data({
-					method: 'GET',
-					url: API_URL + API_END_POINT.schedules + '/find' + query_string,
-					auth: user.access_token,
-					async callback(params) {
-						loader();
-						await load_week_list(params);
-						await load_curriculum(params);
-					}
-				});
 			});
 		});
 		
@@ -121,7 +128,7 @@ export async function render(params) {
 		<h3 class="list-heading">Danh sách Lịch báo giảng</h3>
 		`;
 		
-		if (!params) {
+		if (!params.length) {
 			let blank = create_element('div');
 			blank.innerHTML = `
 			<p class="text-center" style="padding: 16px; margin: 16px; background: #F4F4F4; border-radius: 12px;">
@@ -129,27 +136,25 @@ export async function render(params) {
 			</p>
 			`;
 			template.querySelector('.teacher-curriculum-list').appendChild(blank);
+			await remove_loader();
 			return false;
 		}
 		
 		params.map(item => {
 			if (item.status == 0) {
 				status = 'Thiếu';
-				type = 'create';
 				text_color = 'text-danger';
 				text_btn = 'Nộp';
 			}
 			
 			if (item.status == 1) {
 				status = 'Chờ duyệt';
-				type = 'update';
 				text_color = 'text-warning';
 				text_btn = 'Sửa';
 			}
 			
 			if (item.status == 2) {
 				status = 'Đã duyệt';
-				type = 'complete';
 				text_color = 'text-success';
 				text_btn = 'Xem';
 			}
@@ -169,6 +174,9 @@ export async function render(params) {
 			`;
 			
 			div.querySelector('.btn').addEventListener('click', async (e) => {
+				if (item.status == 0) type = 'create';
+				if (item.status == 1) type = 'update';
+				if (item.status == 2) type = 'complete';
 				loader();
 				let modal = await import('../detail_page.js');
 				document.body.appendChild(await modal.render({
@@ -184,12 +192,14 @@ export async function render(params) {
 	}
 	
 	async function load_week_list(params) {
-		let status = '',
-				type = '';
+		let type = '';
 		
-		if (status == 0) type = 'create';
-		if (status == 1) type = 'update';
-		if (status == 2) type = 'complete';
+		template.querySelector('.tag-list').innerHTML = '';
+		
+		if (!params.length) {
+			await remove_loader();
+			return false;
+		}
 		
 		params.map(item => {
 			let div = create_element('span');
@@ -200,12 +210,18 @@ export async function render(params) {
 					template.querySelector('.date-nav .tag-list .tag-item.active').classList.remove('active')
 				}
 				e.currentTarget.classList.add('active');
+				if (item.status == 0) type = 'create';
+				if (item.status == 1) type = 'update';
+				if (item.status == 2) type = 'complete';
 				loader();
 				let modal = await import('../detail_page.js');
 				document.body.appendChild(await modal.render({
 					type: type,
 					user: user,
-					data: item
+					data: item,
+					async _callback() {
+						await fetch();
+					}
 				}));
 			});
 			
@@ -218,16 +234,18 @@ export async function render(params) {
 	template.querySelector('.page-content').appendChild(await nav_status_filter());
 	template.querySelector('.page-content').appendChild(await list_curriculum());
 	
-	await fetch_data({
-		method: 'GET',
-		url: API_URL + API_END_POINT.schedules,
-		auth: user.access_token,
-		async callback(params) {
-			loader();
-			await load_week_list(params);
-			await load_curriculum(params);
-		}
-	});
+	async function fetch() {
+		await fetch_data({
+			method: 'GET',
+			url: API_URL + API_END_POINT.schedules,
+			auth: user.access_token,
+			async callback(params) {
+				await load_week_list(params);
+				await load_curriculum(params);
+			}
+		});
+	}
+	await fetch();
 	
 	return template;
 }
