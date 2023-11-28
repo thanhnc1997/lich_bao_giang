@@ -12,6 +12,7 @@ import {
 export async function render(params) {
 	let status_query_param = '';
 	let year_query_param = '';
+	let week_query_param = '';
 	
 	let {user} = params;
 	
@@ -33,6 +34,32 @@ export async function render(params) {
 		</div>
 		`;
 		
+		div.querySelector('input').addEventListener('keyup', async (e) => {
+			let week_value = e.target.value;
+			
+			if (!week_value || week_value == '') {
+				week_query_param = '';
+			}
+			else {
+				week_query_param = 'week=' + week_value.replace(/\D/g, '');
+			}
+			
+			if (/\d/.test(week_value) != true && week_value != '') return false;
+			
+			setTimeout(async () => {
+				loader();
+				await fetch_data({
+					method: 'GET',
+					url: API_URL + API_END_POINT.schedules + '/find?' + week_query_param,
+					auth: user.access_token,
+					async callback(params) {
+						await load_week_list(params);
+						await load_curriculum(params);
+					}
+				});
+			}, 400);
+		});
+		
 		return div;
 	}
 	
@@ -42,6 +69,10 @@ export async function render(params) {
 		div.innerHTML = `
 		<div class="date-select align-items-center cursor-pointer">
 			<select class="select mr-auto">
+				20 năm
+				2003 -> 2045
+				2003, 2004
+				2004, 2005
 				<option value="2023,2024" selected>2023 - 2024</option>
 				<option value="2024,2025">2024 - 2025</option>
 			</select>
@@ -90,30 +121,20 @@ export async function render(params) {
 				e.currentTarget.classList.add('active');
 				if (e.currentTarget.getAttribute('data-status') != 'all') {
 					status_query_param = 'status=' + e.currentTarget.getAttribute('data-status');
-					await fetch_data({
-						method: 'GET',
-						url: API_URL + API_END_POINT.schedules + '/find?' + status_query_param + '&' + year_query_param,
-						auth: user.access_token,
-						async callback(params) {
-							loader();
-							await load_week_list(params);
-							await load_curriculum(params);
-						}
-					});
 				}
 				else {
 					status_query_param = '';
-					await fetch_data({
-						method: 'GET',
-						url: API_URL + API_END_POINT.schedules,
-						auth: user.access_token,
-						async callback(params) {
-							loader();
-							await load_week_list(params);
-							await load_curriculum(params);
-						}
-					});
 				}
+				await fetch_data({
+					method: 'GET',
+					url: API_URL + API_END_POINT.schedules + '/find?' + status_query_param + '&' + year_query_param,
+					auth: user.access_token,
+					async callback(params) {
+						loader();
+						await load_week_list(params);
+						await load_curriculum(params);
+					}
+				});
 			});
 		});
 		
@@ -244,7 +265,7 @@ export async function render(params) {
 	async function fetch() {
 		await fetch_data({
 			method: 'GET',
-			url: API_URL + API_END_POINT.schedules,
+			url: API_URL + API_END_POINT.schedules + '/find?year=2023,2024',
 			auth: user.access_token,
 			async callback(params) {
 				await load_week_list(params);
