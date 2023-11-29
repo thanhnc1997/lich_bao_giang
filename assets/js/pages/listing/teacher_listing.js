@@ -211,7 +211,10 @@ export async function render(params) {
 				document.body.appendChild(await modal.render({
 					type: type,
 					user: user,
-					data: item
+					data: item,
+					async _callback() {
+						await fetch();
+					}
 				}));
 			});
 			

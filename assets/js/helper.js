@@ -3,6 +3,7 @@ export const API_URL = 'https://api-schoolportal.eledu.online/api/v1';
 export const API_END_POINT = {
 	sign_in: '/auth/login',
 	schedules: '/schedules',
+	periods: '/periods',
 	classes: '/class',
 	subjects: '/subjects',
 }

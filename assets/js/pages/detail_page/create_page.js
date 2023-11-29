@@ -7,7 +7,8 @@ import {
 	day_translate,
 	loader,
 	remove_loader,
-	format_date
+	format_date,
+	toast
 } from '../../helper.js';
 
 export async function render(params) {
@@ -85,8 +86,8 @@ export async function render(params) {
 		});
 		
 		await load_session({day: current_day});
-		console.log(create_obj)
-		console.log(period_update)
+		// console.log(create_obj)
+		// console.log(period_update)
 	}
 	
 	async function load_session(params) {
@@ -206,6 +207,18 @@ export async function render(params) {
 		</div>
 		`;
 		
+		async function update_period(params) {
+			let {delay} = params;
+			
+			setTimeout(async () => {
+				await fetch_data({
+					method: 'PUT',
+					url: API_URL + API_END_POINT.periods + '/' + params.id,
+					body: period_update[key]
+				});
+			}, delay);
+		}
+		
 		div.querySelector('input[name="empty_period"]').addEventListener('change', e => {
 			empty_period = !empty_period;
 			
@@ -220,29 +233,39 @@ export async function render(params) {
 			period_update[key]['empty_period'] = empty_period;
 		});
 		
-		div.querySelector('input[name="adjustment"]').addEventListener('keyup', e => {
+		div.querySelector('input[name="adjustment"]').addEventListener('keyup', async (e) => {
 			period_update[key]['adjustment'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['adjustment'] = e.target.value;
+			
+			await update_period({delay: 250});
 		});
 		
-		div.querySelector('input[name="name"]').addEventListener('keyup', e => {
+		div.querySelector('input[name="name"]').addEventListener('keyup', async (e) => {
 			period_update[key]['name'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['name'] = e.target.value;
+			
+			await update_period({delay: 250});
 		});
 		
-		div.querySelector('input[name="note"]').addEventListener('change', e => {
+		div.querySelector('input[name="note"]').addEventListener('change', async (e) => {
 			period_update[key]['note'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['note'] = e.target.value;
+			
+			await update_period({delay: 250});
 		});
 		
-		div.querySelector('select[name="classes"]').addEventListener('change', e => {
+		div.querySelector('select[name="classes"]').addEventListener('change', async (e) => {
 			period_update[key]['class_id'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['class']['id'] = e.target.value;
+			
+			await update_period({delay: 100});
 		});
 		
-		div.querySelector('select[name="classes"]').addEventListener('change', e => {
+		div.querySelector('select[name="classes"]').addEventListener('change', async (e) => {
 			period_update[key]['class_id'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['subject']['id'] = e.target.value;
+			
+			await update_period({delay: 250});
 		});
 		
 		classes_list.map(item => {
@@ -357,11 +380,9 @@ export async function render(params) {
 				body: {
 					status: 1
 				},
-				auth: user.access_token,
-				async callback() {
-					await load_list();
-				}
+				auth: user.access_token
 			});
+			await load_list();
 		});
 		
 		return div;
