@@ -6,6 +6,7 @@ export const API_END_POINT = {
 	periods: '/periods',
 	classes: '/class',
 	subjects: '/subjects',
+	years: '/years',
 }
 
 export async function common() {
@@ -150,6 +151,13 @@ export const render_icon = {
 		</svg>
 		`;
 	},
+	plus(params) {
+		return `
+		<svg width="${params.width || '12'}" height="${params.height || '12'}" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<path d="M1 7H7M7 7H13M7 7V13M7 7V1" stroke="${params.stroke || '#000'}" stroke-width="${params.stroke_width || '2'}" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+		`;
+	}
 }
 
 export async function parse_jwt(token) {
@@ -304,6 +312,13 @@ export async function fetch_data(params) {
 				message: data.message.name
 			})
 			return false;
+		}
+		
+		if(data.status && data.status == 200) {
+			toast({
+				type: 'success',
+				message: data.message.name
+			})
 		}
 		
 		if (callback) await callback(data);

@@ -18,13 +18,13 @@ export async function render(params) {
 			subjects_list = [],
 			date_session = 'morning',
 			current_day = '',
-			empty_period = false,
 			create_obj = {};
 	
 	let period_update = {}
 	
 	const template = await create_element('div');
 	template.classList.add('modal-content');
+	template.style.cssText = 'height: 100%';
 	
 	async function format_period_list(params) {
 		params.map(item => {
@@ -164,8 +164,12 @@ export async function render(params) {
 		let key = day.date + '-' + day.session + '-' + params.timetable_id;
 		
 		div.innerHTML = `
-		<h4 style="padding: 12px 16px; background: #EBFAFF;">
-			Ngày ${format_date(day.date)}
+		<h4 class="d-flex align-items-center" style="padding: 12px 16px; background: #EBFAFF;">
+			<span class="mr-auto">Ngày ${format_date(day.date)}</span>
+			<button id="add-period" class="btn btn-primary btn-icon">
+				${render_icon.plus({stroke: '#03177E'})}
+				<span>Bù tiết</span>
+			</button>
 		</h4>
 		<div style="padding: 16px;">
 			<div class="grid grid-3 gap-14 mb-12">
@@ -197,77 +201,82 @@ export async function render(params) {
 			<div class="d-flex align-items-center mb-12">
 				<b class="mr-auto">Tiết trống</b>
 				<label class="switch">
-					<input type="checkbox" name="empty_period">
+					<input type="checkbox" name="empty_period" ${empty_period == true ? 'checked' : ''}>
 					<span class="slider"></span>
 				</label>
 			</div>
-			<div id="note" style="display: none;">
+			<div id="note" style="display: ${empty_period == true ? 'block' : 'none'};">
 				<input class="input" placeholder="Lý do trống tiết" name="note">
 			</div>
 		</div>
 		`;
 		
 		async function update_period(params) {
-			let {delay} = params;
+			let {delay, id} = params;
+			
+			if (!delay) delay = 0;
 			
 			setTimeout(async () => {
 				await fetch_data({
 					method: 'PUT',
-					url: API_URL + API_END_POINT.periods + '/' + params.id,
-					body: period_update[key]
+					url: API_URL + API_END_POINT.periods + '/' + id,
+					body: period_update[key],
+					auth: user.access_token
 				});
 			}, delay);
 		}
 		
-		div.querySelector('input[name="empty_period"]').addEventListener('change', e => {
-			empty_period = !empty_period;
+		div.querySelector('input[name="empty_period"]').addEventListener('change', async (e) => {
+			period_update[key]['empty_period'] = !period_update[key]['empty_period'];
 			
-			if (empty_period == true) {
+			if (period_update[key]['empty_period'] == true) {
 				div.querySelector('#note').style.display = 'block';
 			}
 			
-			if (empty_period == false) {
+			if (period_update[key]['empty_period'] == false) {
 				div.querySelector('#note').style.display = 'none';
 			}
 			
-			period_update[key]['empty_period'] = empty_period;
+			await update_period({id: params.id});
 		});
 		
 		div.querySelector('input[name="adjustment"]').addEventListener('keyup', async (e) => {
 			period_update[key]['adjustment'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['adjustment'] = e.target.value;
 			
-			await update_period({delay: 250});
+			await update_period({delay: 250, id: params.id});
 		});
 		
 		div.querySelector('input[name="name"]').addEventListener('keyup', async (e) => {
 			period_update[key]['name'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['name'] = e.target.value;
 			
-			await update_period({delay: 250});
+			await update_period({delay: 250, id: params.id});
 		});
 		
 		div.querySelector('input[name="note"]').addEventListener('change', async (e) => {
 			period_update[key]['note'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['note'] = e.target.value;
 			
-			await update_period({delay: 250});
+			await update_period({delay: 250, id: params.id});
 		});
 		
 		div.querySelector('select[name="classes"]').addEventListener('change', async (e) => {
 			period_update[key]['class_id'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['class']['id'] = e.target.value;
 			
-			await update_period({delay: 100});
+			await update_period({id: params.id});
 		});
 		
 		div.querySelector('select[name="classes"]').addEventListener('change', async (e) => {
 			period_update[key]['class_id'] = e.target.value;
 			create_obj[day.date][date_session][params.timetable_id]['subject']['id'] = e.target.value;
 			
-			await update_period({delay: 250});
+			await update_period({id: params.id});
 		});
-		
+		//
+		// load all classes and subjects
+		//
 		classes_list.map(item => {
 			let option = create_element('option');
 			option.innerHTML = item.name;
@@ -283,6 +292,56 @@ export async function render(params) {
 
 			div.querySelector('select[name="subjects"]').appendChild(option);
 		});
+		//
+		// add period
+		//
+		div.querySelector('#add-period').addEventListener('click', async (e) => {
+			await fetch_data({
+				method: 'GET',
+				url: API_URL + API_END_POINT.periods + '/find?week_id=' + detail.week.id + '&class_id=' + params.class.id,
+				auth: user.access_token,
+				async callback(params) {
+					document.body.appendChild(await available_period(params));
+				}
+			});
+		});
+		
+		return div;
+	}
+	
+	async function available_period(params) {
+		console.log(params);
+		let div = create_element('div');
+		div.classList.add('modal');
+		div.innerHTML = `
+		<div class="overlay"></div>
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header d-flex align-items-center">
+					<button class="btn back">${render_icon.arrow_left({})}</button>
+					<h3 style="flex-grow: 1;">
+						Danh sách tiết trống
+					</h3>
+				</div>
+				<div class="modal-body"></div>
+				<div class="modal-footer grid grid-2 gap-12">
+					<button class="btn btn-light">Hủy</button>
+					<button class="btn btn-primary">Chọn</button>
+				</div>
+			</div>
+		</div>
+		`;
+		
+		async function remove_modal(trigger) {
+			div.querySelector(trigger).addEventListener('click', (e) => {
+				div.remove();
+			});
+		}
+		
+		remove_modal('.overlay');
+		remove_modal('.modal-header .back');
+		remove_modal('.modal-footer .btn-light');
+		remove_modal('.modal-footer .btn-primary');
 		
 		return div;
 	}
@@ -374,14 +433,17 @@ export async function render(params) {
 		});
 		
 		div.querySelector('.btn.btn-primary').addEventListener('click', async () => {
-			await fetch_data({
-				method: 'PUT',
-				url: API_URL + API_END_POINT.schedules + '/' + detail.id + '/status',
-				body: {
-					status: 1
-				},
-				auth: user.access_token
-			});
+			if (params.detail.status == 0) {
+				await fetch_data({
+					method: 'PUT',
+					url: API_URL + API_END_POINT.schedules + '/' + detail.id + '/status',
+					body: {
+						status: 1
+					},
+					auth: user.access_token
+				});
+			}
+			
 			await load_list();
 		});
 		

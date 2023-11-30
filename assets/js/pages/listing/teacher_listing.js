@@ -68,13 +68,8 @@ export async function render(params) {
 		div.classList.add('nav', 'date-nav');
 		div.innerHTML = `
 		<div class="date-select align-items-center cursor-pointer">
-			<select class="select mr-auto">
-				20 năm
-				2003 -> 2045
-				2003, 2004
-				2004, 2005
-				<option value="2023,2024" selected>2023 - 2024</option>
-				<option value="2024,2025">2024 - 2025</option>
+			<select class="select mr-auto" name="years_list">
+				
 			</select>
 			<span>Tuần</span>
 		</div>
@@ -223,8 +218,30 @@ export async function render(params) {
 		await remove_loader();
 	}
 	
+	async function load_year_list(params) {
+		let {start_year, end_year} = params;
+		
+		await fetch_data({
+			method: 'GET',
+			url: API_URL + API_END_POINT.years,
+			auth: user.access_token,
+			async callback(params) {
+				params.map(item => {
+					let option = create_element('option');
+					option.setAttribute('value', item.start_year + ',' + item.end_year);
+					option.innerHTML = item.start_year + '-' + item.end_year;
+					if (item.start_year == start_year && item.end_year == end_year) option.setAttribute('selected', 'selected');
+					
+					template.querySelector('.select[name="years_list"]').appendChild(option);
+				});
+			}
+		});
+	}
+	
 	async function load_week_list(params) {
-		let type = '';
+		let type = '',
+				start_year = '',
+				end_year = '';
 		
 		template.querySelector('.tag-list').innerHTML = '';
 		
@@ -234,6 +251,9 @@ export async function render(params) {
 		}
 		
 		params.map(item => {
+			start_year = item.week.year.start_year;
+			end_year = item.week.year.end_year;
+			
 			let div = create_element('span');
 			div.classList.add('tag-item', 'square');
 			div.innerHTML = item.week.name;
@@ -258,6 +278,11 @@ export async function render(params) {
 			
 			template.querySelector('.tag-list').appendChild(div);
 		});
+		
+		await load_year_list({
+			start_year: start_year,
+			end_year: end_year,
+		})
 	}
 	
 	template.querySelector('.side-nav').appendChild(await search_box());
@@ -268,7 +293,7 @@ export async function render(params) {
 	async function fetch() {
 		await fetch_data({
 			method: 'GET',
-			url: API_URL + API_END_POINT.schedules + '/find?year=2023,2024',
+			url: API_URL + API_END_POINT.schedules + '/find',
 			auth: user.access_token,
 			async callback(params) {
 				await load_week_list(params);
